@@ -1,12 +1,14 @@
 import React from 'react'
-import { View } from 'react-native'
+import { Image } from 'react-native'
 
 import { Container } from './styles'
+
+import logoImg from '../../assets/logo.png'
 
 const SignIn = () => {
   return (
     <Container>
-      <View />
+      <Image source={logoImg} />
     </Container>
   )
 }
