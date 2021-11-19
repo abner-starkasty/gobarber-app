@@ -6,10 +6,15 @@ import {
   ScrollView,
   View,
 } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from 'react-native-vector-icons/Feather'
 
 import Button from '../../components/Button'
 import Input from '../../components/Input'
+
+import { RootStackParamList } from '../../routes'
+import useKeyboard from '../../hooks/useKeyboard'
 
 import logoImg from '../../assets/logo.png'
 
@@ -22,7 +27,12 @@ import {
   CreateAccountButtonText,
 } from './styles'
 
+type SignInScreenProp = NativeStackNavigationProp<RootStackParamList, 'SignIn'>
+
 const SignIn = () => {
+  const { isKeyboardVisible } = useKeyboard()
+  const { navigate } = useNavigation<SignInScreenProp>()
+
   return (
     <>
       <KeyboardAvoidingView
@@ -34,7 +44,7 @@ const SignIn = () => {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ flex: 1 }}
         >
-          <Container>
+          <Container $isKeyboardVisible={isKeyboardVisible}>
             <Image source={logoImg} />
 
             <View>
@@ -55,7 +65,7 @@ const SignIn = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <CreateAccountButton onPress={() => {}}>
+      <CreateAccountButton onPress={() => navigate('SignUp')}>
         <Icon name="log-in" size={20} color="#ff9000" />
         <CreateAccountButtonText>Create an Account</CreateAccountButtonText>
       </CreateAccountButton>
