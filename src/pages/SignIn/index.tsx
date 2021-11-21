@@ -6,18 +6,21 @@ import {
   ScrollView,
   View,
   TextInput,
+  Alert,
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from 'react-native-vector-icons/Feather'
 import { Form } from '@unform/mobile'
 import { FormHandles } from '@unform/core'
+import * as Yup from 'yup'
 
 import Button from '../../components/Button'
 import Input from '../../components/Input'
 
 import { RootStackParamList } from '../../routes'
 import useKeyboard from '../../hooks/useKeyboard'
+import getValidationErrors from '../../utils/getValidationErrors'
 
 import logoImg from '../../assets/logo.png'
 
@@ -32,6 +35,11 @@ import {
 
 type SignInScreenProp = NativeStackNavigationProp<RootStackParamList, 'SignIn'>
 
+interface SignInFormData {
+  email: string
+  password: string
+}
+
 const SignIn = () => {
   const formRef = useRef<FormHandles>(null)
   const passwordInputRef = useRef<TextInput>(null)
@@ -39,8 +47,41 @@ const SignIn = () => {
   const { isKeyboardVisible } = useKeyboard()
   const { navigate } = useNavigation<SignInScreenProp>()
 
-  const handleSignIn = useCallback((data: object) => {
-    console.log(data)
+  const handleSignIn = useCallback(async (data: SignInFormData) => {
+    try {
+      formRef.current?.setErrors({})
+
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .required('E-mail obrigatório')
+          .email('Digite um e-mail válido'),
+        password: Yup.string().required('Senha obrigatória'),
+      })
+
+      await schema.validate(data, {
+        abortEarly: false,
+      })
+
+      // await signIn({
+      //   email: data.email,
+      //   password: data.password,
+      // })
+
+      // history.push('/dashboard')
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err as any)
+        console.log(errors)
+        formRef.current?.setErrors(errors)
+
+        return
+      }
+
+      Alert.alert(
+        'Authentication Error',
+        'There was an error logging in, check your credentials.',
+      )
+    }
   }, [])
 
   return (
