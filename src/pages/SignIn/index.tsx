@@ -5,6 +5,7 @@ import {
   Platform,
   ScrollView,
   View,
+  TextInput,
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -33,6 +34,7 @@ type SignInScreenProp = NativeStackNavigationProp<RootStackParamList, 'SignIn'>
 
 const SignIn = () => {
   const formRef = useRef<FormHandles>(null)
+  const passwordInputRef = useRef<TextInput>(null)
 
   const { isKeyboardVisible } = useKeyboard()
   const { navigate } = useNavigation<SignInScreenProp>()
@@ -63,8 +65,25 @@ const SignIn = () => {
               onSubmit={handleSignIn}
               style={{ width: '100%' }}
             >
-              <Input name="email" icon="mail" placeholder="E-mail" />
-              <Input name="password" icon="lock" placeholder="Password" />
+              <Input
+                name="email"
+                icon="mail"
+                placeholder="E-mail"
+                autoCorrect={false}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                returnKeyType="next"
+                onSubmitEditing={() => passwordInputRef.current?.focus()}
+              />
+              <Input
+                ref={passwordInputRef}
+                name="password"
+                icon="lock"
+                placeholder="Password"
+                secureTextEntry
+                returnKeyType="send"
+                onSubmitEditing={() => formRef.current?.submitForm()}
+              />
 
               <Button onPress={() => formRef.current?.submitForm()}>
                 Enter
