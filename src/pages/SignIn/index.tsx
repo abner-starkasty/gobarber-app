@@ -18,8 +18,10 @@ import * as Yup from 'yup'
 import Button from '../../components/Button'
 import Input from '../../components/Input'
 
-import { RootStackParamList } from '../../routes'
 import useKeyboard from '../../hooks/useKeyboard'
+import { useAuth } from '../../hooks/auth'
+
+import { RootStackParamList } from '../../routes'
 import getValidationErrors from '../../utils/getValidationErrors'
 
 import logoImg from '../../assets/logo.png'
@@ -46,43 +48,47 @@ const SignIn = () => {
 
   const { isKeyboardVisible } = useKeyboard()
   const { navigate } = useNavigation<SignInScreenProp>()
+  const { signIn, user } = useAuth()
 
-  const handleSignIn = useCallback(async (data: SignInFormData) => {
-    try {
-      formRef.current?.setErrors({})
+  console.log(user)
 
-      const schema = Yup.object().shape({
-        email: Yup.string()
-          .required('E-mail obrigatório')
-          .email('Digite um e-mail válido'),
-        password: Yup.string().required('Senha obrigatória'),
-      })
+  const handleSignIn = useCallback(
+    async (data: SignInFormData) => {
+      try {
+        formRef.current?.setErrors({})
 
-      await schema.validate(data, {
-        abortEarly: false,
-      })
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().required('Senha obrigatória'),
+        })
 
-      // await signIn({
-      //   email: data.email,
-      //   password: data.password,
-      // })
+        await schema.validate(data, {
+          abortEarly: false,
+        })
 
-      // history.push('/dashboard')
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err as any)
-        console.log(errors)
-        formRef.current?.setErrors(errors)
+        await signIn({
+          email: data.email,
+          password: data.password,
+        })
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err as any)
+          console.log(errors)
+          formRef.current?.setErrors(errors)
 
-        return
+          return
+        }
+
+        Alert.alert(
+          'Authentication Error',
+          'There was an error logging in, check your credentials.',
+        )
       }
-
-      Alert.alert(
-        'Authentication Error',
-        'There was an error logging in, check your credentials.',
-      )
-    }
-  }, [])
+    },
+    [signIn],
+  )
 
   return (
     <>

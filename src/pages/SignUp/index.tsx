@@ -77,8 +77,6 @@ const SignUp = () => {
           return
         }
 
-        console.log((err as any).response.data)
-
         Alert.alert(
           'Registration Error',
           'An error occurred while registering, try again.',
